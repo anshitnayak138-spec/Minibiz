@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MiniBiz — Simple shop management</title>
+<meta name="description" content="A simple browser-based sales, stock and customer tracker for small shops.">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#182230;background:#f5f8fc;line-height:1.55}
+.wrap{max-width:980px;margin:auto;padding:22px}.nav{display:flex;justify-content:space-between;align-items:center;gap:15px}
+.logo{font-weight:800;font-size:23px;color:#174ea6}.hero{padding:58px 0 42px;display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:center}
+h1{font-size:clamp(34px,6vw,54px);line-height:1.08;margin:0 0 18px}.lead{font-size:18px;color:#536174}
+.card{background:white;border:1px solid #e3eaf3;border-radius:17px;padding:22px;box-shadow:0 8px 28px #1d35570b}
+button,.btn{display:inline-block;background:#175cd3;color:white;text-decoration:none;border:0;border-radius:10px;padding:13px 18px;font-weight:700;cursor:pointer}
+.btn.alt{background:#e8efff;color:#174ea6;margin-left:8px}.muted{color:#667085;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0 32px}
+h2{font-size:27px;margin:28px 0 10px}.feature h3{margin:4px 0 8px}.feature p{color:#667085;margin:0}
+.notice{background:#fff8e7;border:1px solid #f4d58d;border-radius:12px;padding:14px;color:#684d13}
+footer{padding:25px 0;color:#667085;font-size:13px}
+@media(max-width:700px){.hero{grid-template-columns:1fr;padding:38px 0 25px}.grid{grid-template-columns:1fr}.btn.alt{margin:9px 0 0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="nav"><div class="logo">MiniBiz</div><div class="muted">Simple Business. Smarter Management.</div></nav>
+  <main>
+    <section class="hero">
+      <div>
+        <p class="muted">A simple tool for small shops</p>
+        <h1>Keep your shop records in one place.</h1>
+        <p class="lead">Track sales, customers and stock, then review a basic monthly profit estimate with MiniBiz Manager.</p>
+        <a class="btn" href="app.html">Try the free demo</a>
+        <a class="btn alt" href="#features">Explore features</a>
+        <p class="muted">No account required for this local demo.</p>
+      </div>
+      <div class="card">
+        <h2 style="margin-top:0">What you can do</h2>
+        <p>✓ Record a sale and create a simple bill</p>
+        <p>✓ Keep a customer list</p>
+        <p>✓ Track product quantities</p>
+        <p>✓ View monthly sales and estimated profit</p>
+        <p>✓ Export a backup of your records</p>
+      </div>
+    </section>
+    <section id="features">
+      <h2>Made for everyday shop tasks</h2>
+      <div class="grid">
+        <div class="card feature"><h3>Sales & bills</h3><p>Record products, quantities, discounts and totals.</p></div>
+        <div class="card feature"><h3>Stock tracking</h3><p>See saved product quantities and low-stock alerts.</p></div>
+        <div class="card feature"><h3>Monthly overview</h3><p>Review sales, recorded costs and an estimated profit.</p></div>
+      </div>
+    </section>
+    <section class="notice">
+      <strong>Prototype notice:</strong> MiniBiz is currently an early demo, not a finished commercial accounting product. Data is stored in the browser on the device being used. Export backups regularly. It does not provide cloud sync, secure multi-user accounts, automatic payment collection or verified GST compliance. Test with sample data only; do not rely on it as your only business record.
+    </section>
+    <section>
+      <h2>Pricing</h2>
+      <div class="card">
+        <h3>Free pilot</h3>
+        <p>Try the demo and share feedback before any paid plan is introduced.</p>
+        <p class="muted">Paid pricing will be decided only after customer testing and product improvements.</p>
+        <a class="btn" href="app.html">Open the demo</a>
+      </div>
+    </section>
+  </main>
+  <footer>MiniBiz • Early-stage prototype. No claims of tax, legal or accounting certification.</footer>
+</div>
+</body></html>
