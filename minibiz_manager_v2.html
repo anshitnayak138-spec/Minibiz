@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MiniBiz Manager v2</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:16px;background:#f3f6fb;color:#182230;font-family:Arial,sans-serif}
+.wrap{max-width:1000px;margin:auto}.top,.panel{background:white;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px}
+h1{margin:0 0 5px}h2{font-size:19px;margin:0 0 14px}.muted,.note{color:#667085;font-size:13px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.tab,button{border:0;border-radius:9px;padding:10px 13px;background:#175cd3;color:white;font-weight:700;cursor:pointer}
+.tab{background:#e8efff;color:#174ea6}.tab.active{background:#175cd3;color:white}
+label{display:block;font-size:13px;font-weight:700;margin:9px 0 5px}
+input,select{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;background:white}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+table{width:100%;border-collapse:collapse;margin-top:12px}th,td{text-align:left;border-bottom:1px solid #e8edf3;padding:9px 6px;font-size:13px}
+th{color:#475467}.right{text-align:right}.secondary{background:#e8efff;color:#174ea6}.danger{background:#fff0f0;color:#b42318}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.metric{background:#f8fafc;border:1px solid #e5eaf1;border-radius:10px;padding:12px}.metric strong{display:block;font-size:22px;margin-top:5px}
+.view{display:none}.view.active{display:block}.scroll{overflow-x:auto}.smallbtn{padding:6px 9px;font-size:12px}
+@media(max-width:650px){.grid,.grid3{grid-template-columns:1fr 1fr}body{padding:9px}th,td{font-size:12px;padding:7px 4px}}
+@media print{.tabs,.no-print{display:none!important}body{background:white}.panel,.top{border:0}}
+</style></head>
+<body><div class="wrap">
+<header class="top"><h1>MiniBiz Manager</h1><div class="muted">Version 2 • Simple shop sales, customers and stock tracker</div><p class="note">Data is saved only in this browser on this device. Export a backup regularly. This is a prototype, not tax/accounting software.</p></header>
+<nav class="tabs no-print">
+<button class="tab active" data-view="dashboard">Dashboard</button><button class="tab" data-view="sale">New Sale / Bill</button><button class="tab" data-view="customers">Customers</button><button class="tab" data-view="stock">Stock</button><button class="tab" data-view="reports">Reports</button>
+</nav>
+
+<section id="dashboard" class="view active">
+<div class="panel"><h2>Business overview</h2><div class="grid3">
+<div class="metric">Sales today<strong id="todaySales">₹0.00</strong></div>
+<div class="metric">Sales this month<strong id="monthSales">₹0.00</strong></div>
+<div class="metric">Estimated profit this month<strong id="monthProfit">₹0.00</strong></div>
+<div class="metric">Customers<strong id="customerCount">0</strong></div>
+<div class="metric">Products in stock<strong id="productCount">0</strong></div>
+<div class="metric">Low-stock products<strong id="lowCount">0</strong></div>
+</div></div>
+<div class="panel"><h2>Recent sales</h2><div id="recentSales" class="scroll"></div></div>
+</section>
+
+<section id="sale" class="view">
+<div class="panel"><h2>Create a sale / invoice</h2>
+<div class="grid"><div><label>Customer</label><select id="saleCustomer"><option value="">Walk-in customer</option></select></div><div><label>Or add customer name</label><input id="walkName" placeholder="Customer name (optional)"></div></div>
+<div class="scroll"><table><thead><tr><th>Product</th><th>Qty</th><th>Unit price (₹)</th><th>Line total</th><th class="no-print"></th></tr></thead><tbody id="saleRows"></tbody></table></div>
+<div class="btnrow no-print"><button class="secondary" id="addSaleRow">+ Add item</button></div>
+<div class="grid"><div><label>Other cost for this sale (₹)</label><input id="saleCost" type="number" min="0" value="0"></div><div><label>Discount (₹)</label><input id="saleDiscount" type="number" min="0" value="0"></div></div>
+<div class="metric" style="margin-top:12px">Invoice total<strong id="saleTotal">₹0.00</strong></div>
+<div class="btnrow no-print"><button id="saveSale">Save sale</button><button id="shareBill" class="secondary">Share bill on WhatsApp</button><button onclick="window.print()" class="secondary">Print</button></div>
+<p class="note">Saving a sale updates stock quantities. WhatsApp sharing opens WhatsApp with a text message; you choose whether to send it.</p>
+</div>
+<div class="panel"><h2>Sales history</h2><div id="salesHistory" class="scroll"></div></div>
+</section>
+
+<section id="customers" class="view">
+<div class="panel"><h2>Add customer</h2><div class="grid"><div><label>Name</label><input id="custName" placeholder="Customer name"></div><div><label>Phone (optional)</label><input id="custPhone" inputmode="tel" placeholder="Phone number"></div></div><div class="btnrow no-print"><button id="addCustomer">Save customer</button></div></div>
+<div class="panel"><h2>Customer list</h2><div id="customerList" class="scroll"></div></div>
+</section>
+
+<section id="stock" class="view">
+<div class="panel"><h2>Add / update product</h2><div class="grid3"><div><label>Product name</label><input id="prodName" placeholder="Product"></div><div><label>Selling price (₹)</label><input id="prodPrice" type="number" min="0" value="0"></div><div><label>Purchase cost (₹)</label><input id="prodCost" type="number" min="0" value="0"></div><div><label>Opening / new stock quantity</label><input id="prodQty" type="number" min="0" value="0"></div><div><label>Low-stock alert at</label><input id="prodAlert" type="number" min="0" value="5"></div></div><div class="btnrow no-print"><button id="saveProduct">Save product</button><button id="cancelProductEdit" class="secondary" style="display:none">Cancel edit</button></div><p class="note">For a new product, quantity is added to stock. Use Edit to change an existing product. Deleting a product does not delete old sales records.</p></div>
+<div class="panel"><h2>Stock list</h2><div id="stockList" class="scroll"></div></div>
+</section>
+
+<section id="reports" class="view">
+<div class="panel"><h2>Monthly report</h2><label>Select month</label><input id="reportMonth" type="month"><div class="grid3" style="margin-top:12px"><div class="metric">Sales<strong id="rSales">₹0.00</strong></div><div class="metric">Product cost<strong id="rCost">₹0.00</strong></div><div class="metric">Other costs<strong id="rOther">₹0.00</strong></div><div class="metric">Discounts<strong id="rDiscount">₹0.00</strong></div><div class="metric">Estimated profit<strong id="rProfit">₹0.00</strong></div><div class="metric">Number of bills<strong id="rBills">0</strong></div></div></div>
+<div class="panel"><h2>Backup your data</h2><p class="note">Export a JSON backup before changing browser/device. This file contains your saved customers, products and sales.</p><div class="btnrow no-print"><button id="exportData">Download backup</button><label class="secondary" style="display:inline-block;padding:10px 13px;border-radius:9px;cursor:pointer">Import backup<input id="importData" type="file" accept="application/json" style="display:none"></label></div></div>
+</section>
+<footer class="note" style="padding:8px 2px">MiniBiz Manager v2 • Local-only prototype. No cloud sync, login, automatic payment collection or official GST compliance.</footer>
+</div>
+<script>
+const KEY='minibiz_v2_data';
+let db={customers:[],products:[],sales:[]}, lastBill='', editingProductId=null;
+const $=id=>document.getElementById(id), money=n=>'₹'+(Number(n)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.customers)&&Array.isArray(x.products)&&Array.isArray(x.sales))db=x}catch(e){}}
+function save(){localStorage.setItem(KEY,JSON.stringify(db));renderAll()}
+function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function show(view){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='sale')refreshSaleSelect()}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>show(b.dataset.view)));
+function today(){return new Date().toISOString().slice(0,10)}
+function monthKey(d){return String(d||'').slice(0,7)}
+function totalSale(s){return Math.max(0,s.subtotal-s.discount)}
+function renderDashboard(){
+ const t=today(),m=t.slice(0,7),todaySales=db.sales.filter(s=>s.date===t).reduce((a,s)=>a+s.total,0),ms=db.sales.filter(s=>monthKey(s.date)===m);
+ $('todaySales').textContent=money(todaySales);$('monthSales').textContent=money(ms.reduce((a,s)=>a+s.total,0));
+ $('monthProfit').textContent=money(ms.reduce((a,s)=>a+s.total-s.cost-s.otherCost,0));
+ $('customerCount').textContent=db.customers.length;$('productCount').textContent=db.products.length;
+ $('lowCount').textContent=db.products.filter(p=>p.qty<=p.alert).length;
+ $('recentSales').innerHTML=tableSales(db.sales.slice().reverse().slice(0,5));
+}
+function tableSales(list){if(!list.length)return '<p class="muted">No sales recorded yet.</p>';return '<table><thead><tr><th>Bill</th><th>Date</th><th>Customer</th><th class="right">Total</th></tr></thead><tbody>'+list.map(s=>`<tr><td>${safe(s.id)}</td><td>${safe(s.date)}</td><td>${safe(s.customerName||'Walk-in')}</td><td class="right">${money(s.total)}</td></tr>`).join('')+'</tbody></table>'}
+function renderCustomers(){$('customerList').innerHTML=db.customers.length?'<table><thead><tr><th>Name</th><th>Phone</th></tr></thead><tbody>'+db.customers.map(c=>`<tr><td>${safe(c.name)}</td><td>${safe(c.phone||'—')}</td></tr>`).join('')+'</tbody></table>':'<p class="muted">No customers saved.</p>'}
+function renderStock(){$('stockList').innerHTML=db.products.length?'<table><thead><tr><th>Product</th><th>Sell price</th><th>Cost</th><th>Qty</th><th>Status</th><th>Action</th></tr></thead><tbody>'+db.products.map(p=>`<tr><td>${safe(p.name)}</td><td>${money(p.price)}</td><td>${money(p.cost)}</td><td>${p.qty}</td><td>${p.qty<=p.alert?'Low stock':'In stock'}</td><td><button class="secondary smallbtn" onclick="editProduct('${safe(p.id)}')">Edit</button> <button class="danger smallbtn" onclick="deleteProduct('${safe(p.id)}')">Delete</button></td></tr>`).join('')+'</tbody></table>':'<p class="muted">No products saved.</p>'}
+function renderReports(){const m=$('reportMonth').value||today().slice(0,7),ss=db.sales.filter(s=>monthKey(s.date)===m),sum=k=>ss.reduce((a,s)=>a+(Number(s[k])||0),0);$('rSales').textContent=money(sum('total'));$('rCost').textContent=money(sum('cost'));$('rOther').textContent=money(sum('otherCost'));$('rDiscount').textContent=money(sum('discount'));$('rProfit').textContent=money(sum('total')-sum('cost')-sum('otherCost'));$('rBills').textContent=ss.length}
+function renderAll(){renderDashboard();renderCustomers();renderStock();$('salesHistory').innerHTML=tableSales(db.sales.slice().reverse());renderReports();refreshSaleSelect()}
+function refreshSaleSelect(){const old=$('saleCustomer').value;$('saleCustomer').innerHTML='<option value="">Walk-in customer</option>'+db.customers.map(c=>`<option value="${safe(c.id)}">${safe(c.name)}</option>`).join('');$('saleCustomer').value=old}
+function addSaleRow(productId='',qty=1){const tr=document.createElement('tr');const opts='<option value="">Choose product</option>'+db.products.map(p=>`<option value="${safe(p.id)}" ${p.id===productId?'selected':''}>${safe(p.name)} (stock ${p.qty})</option>`).join('');tr.innerHTML=`<td><select class="sprod">${opts}</select></td><td><input class="sqty" type="number" min="1" step="1" value="${qty}"></td><td><input class="sprice" type="number" min="0" step=".01" value="0"></td><td class="line right">₹0.00</td><td class="no-print"><button class="danger smallbtn del">×</button></td>`;const sel=tr.querySelector('.sprod'),price=tr.querySelector('.sprice');sel.addEventListener('change',()=>{const p=db.products.find(x=>x.id===sel.value);price.value=p?p.price:0;calcSale()});tr.querySelectorAll('input').forEach(x=>x.addEventListener('input',calcSale));tr.querySelector('.del').addEventListener('click',()=>{tr.remove();calcSale()});$('saleRows').appendChild(tr);const p=db.products.find(x=>x.id===productId);if(p)price.value=p.price;calcSale()}
+function saleData(){let subtotal=0,items=[];document.querySelectorAll('#saleRows tr').forEach(tr=>{const id=tr.querySelector('.sprod').value,p=db.products.find(x=>x.id===id),qty=Math.max(0,Number(tr.querySelector('.sqty').value)||0),price=Math.max(0,Number(tr.querySelector('.sprice').value)||0);const amount=qty*price;subtotal+=amount;if(id&&qty)items.push({productId:id,name:p?.name||'',qty,price,amount,cost:(p?.cost||0)*qty})});const discount=Math.min(subtotal,Math.max(0,Number($('saleDiscount').value)||0));return {items,subtotal,discount,total:subtotal-discount,otherCost:Math.max(0,Number($('saleCost').value)||0),cost:items.reduce((a,x)=>a+x.cost,0)}}
+function calcSale(){let sub=0;document.querySelectorAll('#saleRows tr').forEach(tr=>{const q=Math.max(0,Number(tr.querySelector('.sqty').value)||0),p=Math.max(0,Number(tr.querySelector('.sprice').value)||0),v=q*p;sub+=v;tr.querySelector('.line').textContent=money(v)});const d=Math.min(sub,Math.max(0,Number($('saleDiscount').value)||0));$('saleTotal').textContent=money(sub-d)}
+$('addSaleRow').onclick=()=>addSaleRow();$('saleDiscount').oninput=calcSale;$('saleCost').oninput=calcSale;
+$('addCustomer').onclick=()=>{const name=$('custName').value.trim(),phone=$('custPhone').value.trim();if(!name)return alert('Enter customer name.');db.customers.push({id:'C'+Date.now(),name,phone});$('custName').value='';$('custPhone').value='';save()};
+function resetProductForm(){editingProductId=null;$('prodName').value='';$('prodPrice').value=0;$('prodCost').value=0;$('prodQty').value=0;$('prodAlert').value=5;$('saveProduct').textContent='Save product';$('cancelProductEdit').style.display='none'}
+window.editProduct=id=>{const p=db.products.find(x=>x.id===id);if(!p)return;editingProductId=id;$('prodName').value=p.name;$('prodPrice').value=p.price;$('prodCost').value=p.cost;$('prodQty').value=p.qty;$('prodAlert').value=p.alert;$('saveProduct').textContent='Update product';$('cancelProductEdit').style.display='inline-block';$('prodName').focus();window.scrollTo({top:$('stock').offsetTop,behavior:'smooth'})};
+window.deleteProduct=id=>{const p=db.products.find(x=>x.id===id);if(!p)return;if(!confirm('Delete '+p.name+' from current stock list? Old sales records will remain.'))return;db.products=db.products.filter(x=>x.id!==id);if(editingProductId===id)resetProductForm();save()};
+$('cancelProductEdit').onclick=resetProductForm;
+$('saveProduct').onclick=()=>{const name=$('prodName').value.trim();if(!name)return alert('Enter product name.');const qty=Math.max(0,Number($('prodQty').value)||0),price=Math.max(0,Number($('prodPrice').value)||0),cost=Math.max(0,Number($('prodCost').value)||0),alertAt=Math.max(0,Number($('prodAlert').value)||0);if(editingProductId){const p=db.products.find(x=>x.id===editingProductId);if(!p)return alert('Product not found.');if(db.products.some(x=>x.id!==editingProductId&&x.name.toLowerCase()===name.toLowerCase()))return alert('Another product already has this name.');Object.assign(p,{name,qty,price,cost,alert:alertAt});resetProductForm()}else{let p=db.products.find(x=>x.name.toLowerCase()===name.toLowerCase());if(p){p.qty+=qty;p.price=price;p.cost=cost;p.alert=alertAt}else db.products.push({id:'P'+Date.now(),name,qty,price,cost,alert:alertAt});$('prodName').value='';$('prodQty').value=0;}save()};
+$('saveSale').onclick=()=>{const d=saleData();if(!d.items.length)return alert('Add at least one saved product to the bill.');for(const it of d.items){const p=db.products.find(x=>x.id===it.productId);if(!p||p.qty<it.qty)return alert('Not enough stock for '+it.name+'. Sale not saved.')}d.items.forEach(it=>{const p=db.products.find(x=>x.id===it.productId);p.qty-=it.qty});const c=db.customers.find(x=>x.id===$('saleCustomer').value);const name=$('walkName').value.trim()||c?.name||'Walk-in';const s={id:'MB-'+Date.now(),date:today(),customerName:name,items:d.items,subtotal:d.subtotal,discount:d.discount,total:d.total,cost:d.cost,otherCost:d.otherCost};db.sales.push(s);lastBill=s.id;save();alert('Sale saved. Stock updated.');$('saleRows').innerHTML='';addSaleRow();$('saleCost').value=0;$('saleDiscount').value=0;$('walkName').value='';calcSale()};
+$('shareBill').onclick=()=>{const d=saleData();if(!d.items.length)return alert('Add items first. Save the sale before sharing if you want a permanent record.');const c=db.customers.find(x=>x.id===$('saleCustomer').value);const name=$('walkName').value.trim()||c?.name||'Customer';const lines=['MiniBiz bill', 'Customer: '+name,...d.items.map(i=>`${i.name} x ${i.qty} = ${money(i.amount)}`),'Subtotal: '+money(d.subtotal),'Discount: '+money(d.discount),'Total: '+money(d.total)];window.open('https://wa.me/?text='+encodeURIComponent(lines.join('\n')),'_blank')};
+$('reportMonth').value=today().slice(0,7);$('reportMonth').onchange=renderReports;
+$('exportData').onclick=()=>{const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='minibiz-backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)};
+$('importData').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!Array.isArray(x.customers)||!Array.isArray(x.products)||!Array.isArray(x.sales))throw Error();if(confirm('Replace current MiniBiz data with this backup?')){db=x;save();alert('Backup imported.')}}catch(err){alert('Invalid backup file.')}e.target.value=''};
+load();if(!$('saleRows').children.length)addSaleRow();renderAll();
+</script></body></html>
